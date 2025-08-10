@@ -1,0 +1,15 @@
+[Unit]
+Description=MQTT MHI bride (Matthijs)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/data/domotica/mqtt_2_mhi-wf-rac/klima-connector.py
+Restart=always
+RestartSec=30
+User=root
+Group=root
+StandardOutput=null
+
+[Install]
+WantedBy=multi-user.target

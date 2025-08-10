@@ -44,7 +44,11 @@ interval = int(general_Config["interval"] )
 #   MQTT Config
 ######################################
 
-client = mqtt.Client()
+try:
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
+except AttributeError:
+    # Fallback for older paho-mqtt versions
+    client = mqtt.Client()
 client.username_pw_set(username=MQTT_Config["user"], password=MQTT_Config["password"])
 
 mqtt_prefix = MQTT_Config["mqtt_prefix"]
@@ -106,15 +110,15 @@ class GZipRotator:
 #get the root logger
 rootlogger = logging.getLogger()
 #set overall level to debug, default is warning for root logger
-rootlogger.setLevel(logging.DEBUG)
+rootlogger.setLevel(logging.WARNING)
 
-#setup logging to file, rotating at midnight
-filelog = logging.handlers.TimedRotatingFileHandler(log_path + general_Config["log_filename"], when='midnight', interval=1, encoding='utf-8')
-filelog.setLevel(logging.DEBUG)
-fileformatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
-filelog.setFormatter(fileformatter)
-filelog.rotator = GZipRotator()
-rootlogger.addHandler(filelog)
+# #setup logging to file, rotating at midnight
+# filelog = logging.handlers.TimedRotatingFileHandler(log_path + general_Config["log_filename"], when='midnight', interval=1, encoding='utf-8')
+# filelog.setLevel(logging.DEBUG)
+# fileformatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
+# filelog.setFormatter(fileformatter)
+# filelog.rotator = GZipRotator()
+# rootlogger.addHandler(filelog)
 
 #setup logging to console
 console = logging.StreamHandler()
@@ -125,7 +129,6 @@ rootlogger.addHandler(console)
 
 #get a logger for my script
 logger = logging.getLogger(__name__)
-
 
 
 ######################################
