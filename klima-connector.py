@@ -185,9 +185,9 @@ def on_message(client, userdata, message):
         logger.debug("Received MQTT Set message: " + str(message.topic) + ": " + str(message.payload.decode("utf-8")))
         
         topic_parts = message.topic.split("/")
-        inverter_name = topic_parts[2]
-        inverter_attribute = topic_parts[3]
         
+        inverter_name = topic_parts[1]
+        inverter_attribute = topic_parts[3]
         inverter = None
         
          # Check if Inverter Name exists
