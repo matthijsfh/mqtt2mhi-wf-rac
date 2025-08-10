@@ -120,7 +120,7 @@ rootlogger.setLevel(logging.INFO)
 
 #setup logging to console
 console = logging.StreamHandler()
-console.setLevel(logging.DEBUG)
+console.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
 console.setFormatter(formatter)
 rootlogger.addHandler(console)
@@ -307,14 +307,11 @@ def loop():
                 client.reconnect()
             except Exception as e:
                 logger.error(f"Reconnect attempt failed: {e}")
-
                
         ######################################
         #   Read Values from Inverter
         ######################################
         try:
-            
-            
             for inverter in inverters:
                 logger.debug("------ Query Status of " + inverter.name + " " + inverter.IP)
                 
@@ -323,8 +320,6 @@ def loop():
                 args.IP = inverter.IP
                 args.macAddress = inverter.macAddress
             
-                print(args)
-
                 settings = aircon.get_status(args)
                 
                 logger.debug("macaddres :" )
