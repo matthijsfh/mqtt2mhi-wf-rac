@@ -306,7 +306,7 @@ def call_aircon_command(aircon_ip, command, contents=None):
 
     # Log the full response for debugging
     print("--------------------------------------------------------------------------------")
-    print(f"Response from {url}: {response}")
+    print(f"Response from {url}: {response}\n")
     print("--------------------------------------------------------------------------------")
 
     if not response or response.get('result', None) != 0:
@@ -355,9 +355,6 @@ def get_status(args):
     settings = Settings(r['contents']['airconId'])
     settings.set_from_bytes(chunk1)
 
-    print(settings)
-
-
     v = chunk1[6] & 127
     if v == 0:
         error_code = "00"
@@ -366,7 +363,6 @@ def get_status(args):
     else:
         error_code = "E%s" % str(v)
     #print("Error code: %r" % error_code)
-
 
     p = 0
     while (len(chunk2) / 4) > p:

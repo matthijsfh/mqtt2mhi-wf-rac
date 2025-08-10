@@ -9,7 +9,7 @@ Values are published to MQTT and are easy integratable into openHAB and other Sm
 ### Currently the follwing Values from the Inverters are published to MQTT
 
 - power_status
-- preset_temperatur
+- preset_temperature
 - operation_mode
 - airflow
 - auto_3d
@@ -19,7 +19,7 @@ Values are published to MQTT and are easy integratable into openHAB and other Sm
 ### Currently the follwing Values are read from MQTT and will be send to the Invertes
 
 - power_status
-- preset_temperatur
+- preset_temperature
 - airflow
 
 ### requirements

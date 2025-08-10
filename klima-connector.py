@@ -13,12 +13,6 @@ import argparse
 
 import aircon
 
-######################################
-#
-#   V 1.0: 13.05.2024:  Initial Release
-#   V 1.3: 25.06.2024:  Added on_disconnect to handle MQTT disconect events
-
-
 # Get the directory of the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -28,7 +22,6 @@ config_file_path = os.path.join(script_dir, 'config.ini')
 # Check if the config file exists
 if not os.path.isfile(config_file_path):
     raise FileNotFoundError(f"The configuration file {config_file_path} was not found.")
-
 
 #Read config.ini file
 config_object = ConfigParser()
@@ -57,9 +50,7 @@ mqtt_prefix = MQTT_Config["mqtt_prefix"]
 #   Inverter Config
 ######################################
 
-
 Inverter_configs = config_object.items("Inverters")
-
 
 class Inverter:
     def __init__(self, name, IP):
@@ -67,7 +58,7 @@ class Inverter:
         self.macAddress = None
         self.IP = IP
         self.power_status = None
-        self.preset_temperatur = None
+        self.preset_temperature = None
         self.operation_mode  = None
         self.airflow  = None
         self.auto_3d  = None
@@ -117,7 +108,7 @@ class GZipRotator:
 #get the root logger
 rootlogger = logging.getLogger()
 #set overall level to debug, default is warning for root logger
-rootlogger.setLevel(logging.DEBUG)
+rootlogger.setLevel(logging.INFO)
 
 # #setup logging to file, rotating at midnight
 # filelog = logging.handlers.TimedRotatingFileHandler(log_path + general_Config["log_filename"], when='midnight', interval=1, encoding='utf-8')
@@ -225,7 +216,7 @@ def on_message(client, userdata, message):
                 logger.info("Set Power of " + inverter_name + " to OFF ")
                 args.on_off = False
                 aircon.set_status(args)
-        if inverter_attribute == "preset_temperatur":
+        if inverter_attribute == "preset_temperature":
             try:
                 args.temperature = float(message.payload.decode("utf-8"))
             except:
@@ -350,7 +341,7 @@ def loop():
                 ######################################
             
                 client.publish(mqtt_prefix + inverter.name + "/" + "power_status", bool2onoff(bool(settings.on_off.value)), 0, False)
-                client.publish(mqtt_prefix + inverter.name + "/" + "preset_temperatur", settings.preset_temp.value, 0, False)
+                client.publish(mqtt_prefix + inverter.name + "/" + "preset_temperature", settings.preset_temp.value, 0, False)
                 client.publish(mqtt_prefix + inverter.name + "/" + "operation_mode", settings.op_mode.value, 0, False)
                 client.publish(mqtt_prefix + inverter.name + "/" + "airflow", settings.airflow.value, 0, False)
                 client.publish(mqtt_prefix + inverter.name + "/" + "auto_3d", settings.entrust.value, 0, False)
