@@ -1,0 +1,34 @@
+2025-08-10 13:28:38,566 DEBUG    Received MQTT Set message: aircos/aircoouders/set/power_status: OFF
+2025-08-10 13:28:38,567 INFO     Set Power of aircoouders to OFF 
+data: {'apiVer': '1.0', 'command': 'getAirconStat', 'deviceId': 'Ryzen5', 'operatorId': 'matth', 'timestamp': 1754825318, 'contents': {'airconId': 'unused-but-required'}}
+2025-08-10 13:28:38,568 DEBUG    Starting new HTTP connection (1): 192.168.3.170:51443
+2025-08-10 13:28:39,340 DEBUG    http://192.168.3.170:51443 "POST /beaver/command/getAirconStat HTTP/11" 200 592
+Response from http://192.168.3.170:51443/beaver/command/getAirconStat: {'command': 'getAirconStat', 'apiVer': '1.0', 'operatorId': 'matth', 'deviceId': 'Ryzen5', 'timestamp': 1754825318, 'result': 0, 'contents': {'airconId': 'unused-but-reAQCrn67/AAAAAAAUCgAAAAAAAf////8/moEECRculgAAiAIABAAAAAAAAAOAIJj/gBDI/5QQAABEIw==', 'airconStat': 'AQCrn67/AAAAAAAUCgAAAAAAAf////8/moEECRculgAAiAIABAAAAAAAAAOAIJj/gBDI/5QQAABEIw==', 'logStat': 0, 'updatedBy': 'local', 'expires': 1754824959, 'ledStat': 1, 'autoHeating': 0, 'highTemp': 'AB', 'lowTemp': '66', 'firmType': 'WF-RAC', 'wireless': {'firmVer': '010'}, 'mcu': {'firmVer': '123'}, 'timezone': 'Europe/Amsterdam', 'remoteList': ['', '', '', ''], 'numOfAccount': 2}}    
+Current settings:
+  On/off: True
+  Preset temperature: 23.0
+  Operation Mode: 1 (Cool)
+  Airflow: 0 (Auto)
+  3D Auto: 0 (Off)
+  Model Number: 1
+  Cool Hot Judge(?): 1
+  Vacant Property: 0
+  Self clean: 0
+  Wind Direction (Up/Down): 2 (2)
+  Wind Direction (Left/Right): 5 (5)
+New settings:
+  On/off: False
+  Preset temperature: 23.0
+  Operation Mode: 1 (Cool)
+  Airflow: 0 (Auto)
+  3D Auto: 0 (Off)
+  Model Number: 1
+  Cool Hot Judge(?): 1
+  Vacant Property: 0
+  Self clean: 0
+  Wind Direction (Up/Down): 2 (2)
+  Wind Direction (Left/Right): 5 (5)
+data: {'apiVer': '1.0', 'command': 'setAirconStat', 'deviceId': 'Ryzen5', 'operatorId': 'matth', 'timestamp': 1754825319, 'contents': {'airconId': 'unused-but-reAQCrn67/AAAAAAAUCgAAAAAAAf////8/moEECRculgAAiAIABAAAAAAAAAOAIJj/gBDI/5QQAABEIw==', 'airconStat': 'AQCqn67/AAAAAAAUCgAAAAAAAf/////JTwEACBcu/wAAAAAABAAAAAAAAAH/////tb8='}}
+2025-08-10 13:28:39,343 DEBUG    Starting new HTTP connection (1): 192.168.3.170:51443
+2025-08-10 13:28:40,258 DEBUG    http://192.168.3.170:51443 "POST /beaver/command/setAirconStat HTTP/11" 200 592
+Response from http://192.168.3.170:51443/beaver/command/setAirconStat: {'command': 'setAirconStat', 'apiVer': '1.0', 'operatorId': 'matth', 'deviceId': 'Ryzen5', 'timestamp': 1754825319, 'result': 0, 'contents': {'airconId': 'unused-but-reAQCqn67/AAAAAAAUCgAAAAAAAf/////JT4EECBculgAAiAIABAAAAAAAAAOAIJj/gBDI/5QQAADoIA==', 'airconStat': 'AQCqn67/AAAAAAAUCgAAAAAAAf/////JT4EECBculgAAiAIABAAAAAAAAAOAIJj/gBDI/5QQAADoIA==', 'logStat': 0, 'updatedBy': 'local', 'expires': 1754825379, 'ledStat': 1, 'autoHeating': 0, 'highTemp': 'AB', 'lowTemp': '66', 'firmType': 'WF-RAC', 'wireless': {'firmVer': '010'}, 'mcu': {'firmVer': '123'}, 'timezone': 'Europe/Amsterdam', 'remoteList': ['', '', '', ''], 'numOfAccount': 2}} 

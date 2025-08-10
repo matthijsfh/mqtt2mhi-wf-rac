@@ -295,17 +295,22 @@ def call_aircon_command(aircon_ip, command, contents=None):
     if contents:
         data['contents'] = contents
 
-    #print("posting to %r" % url)
-    #print("data: %r" % data)
+    # print("posting to %r" % url)
+    print("data: %r" % data)
 
-    response = requests.post(url, json=data, timeout=5)
+    response = requests.post(url, json=data, timeout=10)
+
     if response:
         response = response.json()
 
-    #print("response: %r" % response)
+    # Log the full response for debugging
+    print(f"Response from {url}: {response}")
 
-    if not response or response.get('result', None) != 0:
-        raise Exception(f"Call to {url} failed")
+    # if not response or response.get('result', None) != 0:
+    #     # Log error details before raising
+    #     # print(f"Error: Call to {url} failed. Response: {response}")
+    #     raise Exception(f"Call to {url} failed")
+
     return response
 
 def get_status(args):

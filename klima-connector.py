@@ -45,7 +45,7 @@ interval = int(general_Config["interval"] )
 ######################################
 
 try:
-    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 except AttributeError:
     # Fallback for older paho-mqtt versions
     client = mqtt.Client()
@@ -110,7 +110,7 @@ class GZipRotator:
 #get the root logger
 rootlogger = logging.getLogger()
 #set overall level to debug, default is warning for root logger
-rootlogger.setLevel(logging.WARNING)
+rootlogger.setLevel(logging.DEBUG)
 
 # #setup logging to file, rotating at midnight
 # filelog = logging.handlers.TimedRotatingFileHandler(log_path + general_Config["log_filename"], when='midnight', interval=1, encoding='utf-8')
@@ -139,38 +139,39 @@ def get_time():
     now = (datetime.datetime.now()).strftime("%Y-%m-%d %H:%M:%S")
     return now    
 
-def on_connect(client, userdata, flags, rc):
-    logger.debug("Connected to MQTT with result code " + str(rc))
-    if rc == 0:
+
+# Version 2 callback signature
+def on_connect(client, userdata, flags, reasonCode, properties=None):
+    logger.debug(f"Connected to MQTT with reasonCode {reasonCode}")
+    if reasonCode == 0:
         logger.debug("Connected to MQTT successfully")
         client.connected_flag = True
         advertize_device()
-
-        # Subscribing in on_connect() so that if connection is lost subscription will also be renewed
         client.subscribe(mqtt_prefix + "#")
-
     else:
-        logger.error("Connect to MQTT failed with return code: " + str(rc))
+        logger.error(f"Connect to MQTT failed with reasonCode: {reasonCode}")
         client.connected_flag = False
     
 
-# Define the callback for disconnection
-def on_disconnect(client, userdata, rc):
-    logger.debug("Disconnected from MQTT with result code " + str(rc))
+
+# Version 2 callback signature
+def on_disconnect(client, userdata, reasonCode, properties=None):
+    logger.debug(f"Disconnected from MQTT with reasonCode {reasonCode}")
     client.connected_flag = False
-    if rc != 0:
+    if reasonCode != 0:
         print("Unexpected disconnection. Will attempt to reconnect.")
         client.reconnect_flag = True
             
 
-# Define the callback for reconnection
-def on_reconnect(client, userdata, rc):
-    if rc == 0:
+
+# Version 2 callback signature
+def on_reconnect(client, userdata, flags, reasonCode, properties=None):
+    if reasonCode == 0:
         logger.info("Successfully reconnected to MQTT")
         client.connected_flag = True
         client.reconnect_flag = False
     else:
-        logger.error("Reconnect to MQTT failed with return code: " + str(rc))
+        logger.error(f"Reconnect to MQTT failed with reasonCode: {reasonCode}")
         client.connected_flag = False
         client.reconnect_flag = True
 
@@ -183,60 +184,46 @@ def advertize_device():
     
            
 def on_message(client, userdata, message):
-     
+    # Version 2 callback signature is unchanged for on_message, but message now has properties
     if "/set" in message.topic:
         logger.debug("Received MQTT Set message: " + str(message.topic) + ": " + str(message.payload.decode("utf-8")))
-        
         topic_parts = message.topic.split("/")
-        
         inverter_name = topic_parts[1]
         inverter_attribute = topic_parts[3]
         inverter = None
-        
-         # Check if Inverter Name exists
+        # Check if Inverter Name exists
         found = False
         for inv in inverters:
             if inv.name == inverter_name:
                 inverter = inv
                 found = True
                 break
-                
         if not found:
             logger.error("Received MQTT Set message for Inverter Name " + inverter_name + " but the Name is not found in Config!")
             return
-        
         args = init_args()
-        
         # Set IP of received Inverter
         args.IP = inverter.IP
-        
-        
         ####################################
         #set received attribute
         ####################################
-        
         if inverter_attribute == "power_status":
-                
             if str(message.payload.decode("utf-8"))== "ON":
                 logger.info("Set Power of " + inverter_name + " to ON ")
                 args.on_off = True
                 aircon.set_status(args)
-            
             if str(message.payload.decode("utf-8"))== "OFF":
                 logger.info("Set Power of " + inverter_name + " to OFF ")
                 args.on_off = False
                 aircon.set_status(args)
-                        
         if inverter_attribute == "preset_temperatur":
             try:
                 args.temperature = float(message.payload.decode("utf-8"))
             except:
                 logger.error("Could not Convert received value to float")
                 return
-           
             logger.info("Set Preset Temperature of " + inverter_name + " to " +  str(message.payload.decode("utf-8")))
             aircon.set_status(args)
-        
         if inverter_attribute == "airflow":
             try:
                 if 0 <= int(message.payload.decode("utf-8")) <= 4:
