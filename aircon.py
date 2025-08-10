@@ -268,7 +268,6 @@ class Settings:
 
         return byte_array
 
-
     def crc(self, byte_array):
         i = 65535
         for b in byte_array:
@@ -282,6 +281,24 @@ class Settings:
                     i ^= 4129
         i = i & 65535
         return [ i & 255, (i >> 8) & 255 ]
+
+    def to_json(self):
+        import json
+        # Serialize main attributes to JSON
+        return json.dumps({
+            'aircon_id': self.aircon_id,
+            'on_off': getattr(self.on_off, 'value', None),
+            'preset_temp': getattr(self.preset_temp, 'value', None),
+            'op_mode': getattr(self.op_mode, 'value', None),
+            'airflow': getattr(self.airflow, 'value', None),
+            'entrust': getattr(self.entrust, 'value', None),
+            'model_no': getattr(self.model_no, 'value', None),
+            'cool_hot_judge': getattr(self.cool_hot_judge, 'value', None),
+            'vacant_property': getattr(self.vacant_property, 'value', None),
+            'self_clean': getattr(self.self_clean, 'value', None),
+            'wind_dir_ud': getattr(self.wind_dir_ud, 'value', None),
+            'wind_dir_lr': getattr(self.wind_dir_lr, 'value', None)
+        })
 
 def call_aircon_command(aircon_ip, command, contents=None):
     url = f"http://{aircon_ip}:51443/beaver/command/{command}"

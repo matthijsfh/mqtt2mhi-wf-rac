@@ -347,8 +347,9 @@ def loop():
                 client.publish(mqtt_prefix + inverter.name + "/" + "auto_3d", settings.entrust.value, 0, False)
                 client.publish(mqtt_prefix + inverter.name + "/" + "wind_ud", settings.wind_dir_ud.value, 0, False)
                 client.publish(mqtt_prefix + inverter.name + "/" + "wind_lr", settings.wind_dir_lr.value, 0, False)
-            
- 
+
+                client.publish(mqtt_prefix + inverter.name + "/" + "status_json", settings.to_json(), 0, False)
+
         except IOError:
             logger.error("Reading Inverter failed")  
             time.sleep(interval / 2)
