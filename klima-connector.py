@@ -64,6 +64,7 @@ Inverter_configs = config_object.items("Inverters")
 class Inverter:
     def __init__(self, name, IP):
         self.name = name
+        self.macAddress = None
         self.IP = IP
         self.power_status = None
         self.preset_temperatur = None
@@ -75,8 +76,14 @@ class Inverter:
 
 
 # Create a list of Inverter instances
-inverters = [Inverter(name, IP) for name, IP in Inverter_configs]
-    
+inverters = []
+for name, ip_mac in Inverter_configs:
+    ip_parts = ip_mac.split("_")
+    ip = ip_parts[0]
+    mac = ip_parts[1] if len(ip_parts) > 1 else None
+    inverter = Inverter(name, ip)
+    inverter.macAddress = mac
+    inverters.append(inverter)
 
 
 ######################################
@@ -204,6 +211,8 @@ def on_message(client, userdata, message):
         args = init_args()
         # Set IP of received Inverter
         args.IP = inverter.IP
+        args.macAddress = inverter.macAddress
+        
         ####################################
         #set received attribute
         ####################################
@@ -321,9 +330,13 @@ def loop():
                 client.publish(mqtt_prefix + inverter.name + "/name", inverter.name, 1, True)
             
                 args.IP = inverter.IP
+                args.macAddress = inverter.macAddress
             
+                print(args)
+
                 settings = aircon.get_status(args)
                 
+                logger.debug("macaddres :" )
                 logger.debug("Status: " + str(settings.on_off.value))
                 logger.debug("Preset Temperature: " + str(settings.preset_temp.value))
                 logger.debug("op_mode: " + str(settings.op_mode.value))

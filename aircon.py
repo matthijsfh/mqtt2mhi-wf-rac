@@ -292,11 +292,12 @@ def call_aircon_command(aircon_ip, command, contents=None):
         "operatorId": config.MY_OPERATOR_ID,
         "timestamp": int(time.time())
     }
+    
     if contents:
         data['contents'] = contents
 
     # print("posting to %r" % url)
-    print("data: %r" % data)
+    # print("data: %r" % data)
 
     response = requests.post(url, json=data, timeout=10)
 
@@ -304,11 +305,13 @@ def call_aircon_command(aircon_ip, command, contents=None):
         response = response.json()
 
     # Log the full response for debugging
+    print("--------------------------------------------------------------------------------")
     print(f"Response from {url}: {response}")
+    print("--------------------------------------------------------------------------------")
 
-    # if not response or response.get('result', None) != 0:
-    #     # Log error details before raising
-    #     # print(f"Error: Call to {url} failed. Response: {response}")
+    if not response or response.get('result', None) != 0:
+        # Log error details before raising
+        print(f"Error: Call to {url} failed. Response: {response}")
     #     raise Exception(f"Call to {url} failed")
 
     return response
@@ -317,7 +320,11 @@ def get_status(args):
     r = call_aircon_command(
         args.IP,
         'getAirconStat',
-        contents={ "airconId": 'unused-but-required' })
+        contents={"airconId": args.macAddress, "airconStat" : ""}
+        )
+
+    # airconId returns same base64 as airconStat (should be mac address)
+    # airconstat returns a base64 encodeded array of bytes.
 
     #print("Got response:\n" + json.dumps(r, indent=2))
     blob = base64.b64decode(r['contents']['airconStat'])
@@ -348,7 +355,7 @@ def get_status(args):
     settings = Settings(r['contents']['airconId'])
     settings.set_from_bytes(chunk1)
 
-    #print(settings)
+    print(settings)
 
 
     v = chunk1[6] & 127
