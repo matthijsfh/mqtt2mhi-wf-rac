@@ -130,3 +130,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+paho_2_venv/bin/python3.12
+paho_2_venv/bin/python3
+paho_2_venv/bin/python
+logs/klima-connector.log.2025-12-24.gz
+logs/klima-connector.log.2025-12-23.gz

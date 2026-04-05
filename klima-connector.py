@@ -107,13 +107,14 @@ class GZipRotator:
 
 #get the root logger
 rootlogger = logging.getLogger()
+
 #set overall level to debug, default is warning for root logger
-rootlogger.setLevel(logging.INFO)
+rootlogger.setLevel(logging.DEBUG)
 
 # #setup logging to file, rotating at midnight
 # filelog = logging.handlers.TimedRotatingFileHandler(log_path + general_Config["log_filename"], when='midnight', interval=1, encoding='utf-8')
 # filelog.setLevel(logging.DEBUG)
-# fileformatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
+# fileformatter = logging.Formatter('%(asctime)s %(levelname)-8s [%(threadName)s] %(message)s')
 # filelog.setFormatter(fileformatter)
 # filelog.rotator = GZipRotator()
 # rootlogger.addHandler(filelog)
@@ -121,7 +122,7 @@ rootlogger.setLevel(logging.INFO)
 #setup logging to console
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
+formatter = logging.Formatter('%(asctime)s %(levelname)-8s [%(threadName)s] %(message)s')
 console.setFormatter(formatter)
 rootlogger.addHandler(console)
 
@@ -157,7 +158,7 @@ def on_disconnect(client, userdata, reasonCode, properties=None):
     logger.debug(f"Disconnected from MQTT with reasonCode {reasonCode}")
     client.connected_flag = False
     if reasonCode != 0:
-        print("Unexpected disconnection. Will attempt to reconnect.")
+        logger.warning("Unexpected disconnection. Will attempt to reconnect.")
         client.reconnect_flag = True
             
 
@@ -183,8 +184,10 @@ def advertize_device():
            
 def on_message(client, userdata, message):
     # Version 2 callback signature is unchanged for on_message, but message now has properties
+    logger.debug("Received MQTT message: " + str(message.topic) + ": " + str(message.payload.decode("utf-8")))
+    
     if "/set" in message.topic:
-        logger.debug("Received MQTT Set message: " + str(message.topic) + ": " + str(message.payload.decode("utf-8")))
+        logger.debug("Processing MQTT Set message: " + str(message.topic) + ": " + str(message.payload.decode("utf-8")))
         topic_parts = message.topic.split("/")
         inverter_name = topic_parts[1]
         inverter_attribute = topic_parts[3]
@@ -216,6 +219,21 @@ def on_message(client, userdata, message):
                 logger.info("Set Power of " + inverter_name + " to OFF ")
                 args.on_off = False
                 aircon.set_status(args)
+
+        if inverter_attribute == "operation_mode":
+            try:
+                if 0 <= int(message.payload.decode("utf-8")) <= 4:
+                    args.op_mode = int(message.payload.decode("utf-8"))
+                else: 
+                    logger.error("Operation mode must be in Range 0-4")
+                    return
+            except:
+                logger.error("Could not convert received value to int value")
+                return
+            
+            logger.info("Set operation mode of " + inverter_name + " to " +  str(message.payload.decode("utf-8")))
+            aircon.set_status(args)
+
         if inverter_attribute == "preset_temperature":
             try:
                 args.temperature = float(message.payload.decode("utf-8"))
@@ -224,6 +242,7 @@ def on_message(client, userdata, message):
                 return
             logger.info("Set Preset Temperature of " + inverter_name + " to " +  str(message.payload.decode("utf-8")))
             aircon.set_status(args)
+
         if inverter_attribute == "airflow":
             try:
                 if 0 <= int(message.payload.decode("utf-8")) <= 4:
@@ -232,12 +251,12 @@ def on_message(client, userdata, message):
                     logger.error("Airflow Value must be in Range 0-4")
                     return
             except:
-                logger.error("Could not Convert received value to int value")
+                logger.error("Could not convert received value to int value")
                 return
             
             logger.info("Set Airflow of " + inverter_name + " to " +  str(message.payload.decode("utf-8")))
             aircon.set_status(args)
-                                       
+    return                            
     
 # Assign callback function to handle incoming messages
 client.on_message = on_message
@@ -285,6 +304,7 @@ def init_args():
     args.airflow = None
     args.wind_ud = None
     args.wind_lr = None
+    args.op_mode = None
     
     return args
 
@@ -354,6 +374,11 @@ def loop():
         logger.debug("------- Loop Iteration Ended ---------")
 
         logger.debug("Sleep for " + str(interval) + "s")
+
+        # Ensure logs are flushed before sleeping
+        for handler in logger.handlers:
+            handler.flush()
+
         time.sleep(interval)
 
 try:

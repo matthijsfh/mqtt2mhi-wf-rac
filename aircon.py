@@ -429,6 +429,7 @@ def set_status(args):
             (args.airflow, settings.airflow),
             (args.wind_ud, settings.wind_dir_ud),
             (args.wind_lr, settings.wind_dir_lr),
+            (args.op_mode, settings.op_mode),
             ]:
         if arg is not None:
             setting.set(arg)
