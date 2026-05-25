@@ -7,6 +7,7 @@
 import base64
 import argparse
 import time
+import logging
 import requests
 
 from zeroconf import Zeroconf, ServiceStateChange, ServiceBrowser
@@ -14,6 +15,8 @@ from typing import cast
 
 import constants
 import config
+
+logger = logging.getLogger(__name__)
 
 class AttrBase:
     def __init__(self, name):
@@ -130,7 +133,7 @@ class AttrAggregateEnum(AttrBase):
         for component in self._components:
             component.apply(byte_array, is_control=is_control)
 
-class Settings:
+class Settings():
     def __init__(self, aircon_id):
         self.aircon_id = aircon_id
         self.on_off = AttrByte('On/off',
@@ -313,23 +316,17 @@ def call_aircon_command(aircon_ip, command, contents=None):
     if contents:
         data['contents'] = contents
 
-    # print("posting to %r" % url)
-    # print("data: %r" % data)
-
     response = requests.post(url, json=data, timeout=10)
 
     if response:
         response = response.json()
 
-    # Log the full response for debugging
-    print("--------------------------------------------------------------------------------")
-    print(f"Response from {url}: {response}\n")
-    print("--------------------------------------------------------------------------------")
+    logger.info("--------------------------------------------------------------------------------")
+    logger.info(f"Response from {url}: {response}")
+    logger.info("--------------------------------------------------------------------------------")
 
     if not response or response.get('result', None) != 0:
-        # Log error details before raising
-        print(f"Error: Call to {url} failed. Response: {response}")
-    #     raise Exception(f"Call to {url} failed")
+        logger.info(f"Error: Call to {url} failed. Response: {response}")
 
     return response
 
@@ -420,7 +417,7 @@ def get_status(args):
 
 def set_status(args):
     settings = get_status(args)
-    print(f"Current settings:\n{settings}")
+    logging.info(f"Current settings:\n{settings}")
 
     for arg, setting in [
             (args.temperature, settings.preset_temp),
@@ -433,7 +430,7 @@ def set_status(args):
         if arg is not None:
             setting.set(arg)
 
-    print(f"New settings:\n{settings}")
+    logging.info(f"New settings:\n{settings}")
 
     payload = base64.b64encode(bytes(settings.to_bytes())).decode('utf-8')
 
@@ -453,7 +450,6 @@ def set_status(args):
     updated_settings = Settings(r['contents']['airconId'])
     updated_settings.set_from_bytes(blob[offset:end])
 
-    #print(f"Updated settings:\n{updated_settings}")
 
 class RegistrationFailed(Exception):
     pass
@@ -495,9 +491,9 @@ def find_devices(args):
             if info:
                 addrs = [f"{addr}:{cast(int, info.port)}"
                          for addr in info.parsed_scoped_addresses()]
-                print(f"Server: {info.server}")
-                print(f"Addresses: {' '.join(addrs)}")
-                print()
+                logging.info(f"Server: {info.server}")
+                logging.info(f"Addresses: {' '.join(addrs)}")
+                logging.info("\n")
 
     zc = Zeroconf()
     ServiceBrowser(zc, ['_beaver._tcp.local.'], handlers=[on_service_state_change])
