@@ -121,7 +121,7 @@ rootlogger.setLevel(logging.DEBUG)
 
 #setup logging to console
 console = logging.StreamHandler()
-console.setLevel(logging.INFO)
+console.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s %(levelname)-8s [%(threadName)s] %(message)s')
 console.setFormatter(formatter)
 rootlogger.addHandler(console)
@@ -183,10 +183,9 @@ def advertize_device():
     
            
 def on_message(client, userdata, message):
-    # Version 2 callback signature is unchanged for on_message, but message now has properties
-    logger.debug("Received MQTT message: " + str(message.topic) + ": " + str(message.payload.decode("utf-8")))
-    
     if "/set" in message.topic:
+        # Version 2 callback signature is unchanged for on_message, but message now has properties
+        # logger.debug("Received MQTT message: " + str(message.topic) + ": " + str(message.payload.decode("utf-8")))
         logger.debug("Processing MQTT Set message: " + str(message.topic) + ": " + str(message.payload.decode("utf-8")))
         topic_parts = message.topic.split("/")
         inverter_name = topic_parts[1]
@@ -311,8 +310,6 @@ def init_args():
 ######################################
 #   Main Loop
 ######################################
-
-
 def loop():
     while True:
         
@@ -342,14 +339,14 @@ def loop():
             
                 settings = aircon.get_status(args)
                 
-                logger.debug("macaddres :" )
-                logger.debug("Status: " + str(settings.on_off.value))
-                logger.debug("Preset Temperature: " + str(settings.preset_temp.value))
-                logger.debug("op_mode: " + str(settings.op_mode.value))
-                logger.debug("airflow: " + str(settings.airflow.value))
-                logger.debug("auto_3d: " + str(settings.entrust.value))
-                logger.debug("wind_dir_ud: " + str(settings.wind_dir_ud.value))
-                logger.debug("wind_dir_lr: " + str(settings.wind_dir_lr.value))
+                # logger.debug("macaddres :" )
+                logger.debug("Status       : " + str(settings.on_off.value))
+                logger.debug("Temperature: : " + str(settings.preset_temp.value))
+                logger.debug("op_mode      : " + str(settings.op_mode.value))
+                logger.debug("airflow      : " + str(settings.airflow.value))
+                logger.debug("auto_3d      : " + str(settings.entrust.value))
+                logger.debug("wind_dir_ud  : " + str(settings.wind_dir_ud.value))
+                logger.debug("wind_dir_lr  : " + str(settings.wind_dir_lr.value))
     
                 ######################################
                 #   MQTT publish
@@ -372,7 +369,6 @@ def loop():
             raise
 
         logger.debug("------- Loop Iteration Ended ---------")
-
         logger.debug("Sleep for " + str(interval) + "s")
 
         # Ensure logs are flushed before sleeping

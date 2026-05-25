@@ -361,7 +361,6 @@ def get_status(args):
     chunk1 = blob[offset:end]  # r5
 
     #print_hex(chunk1)
-
     #print(repr(chunk1))
 
     offset += 19

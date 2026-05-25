@@ -7,6 +7,9 @@ Wants=network-online.target
 ExecStart=/data/domotica/aircos/paho_2_venv/bin/python /data/domotica/aircos/klima-connector.py
 Restart=always
 RestartSec=300
+RuntimeMaxSec=4h
+StandardOutput=append:/var/log/aircos.log
+StandardError=append:/var/log/aircos.log
 User=root
 Group=root
 
