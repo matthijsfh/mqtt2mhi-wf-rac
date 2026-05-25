@@ -4,7 +4,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=/data/domotica/aircos/paho_2_venv/bin/python /data/domotica/aircos/klima-connector.py
+ExecStart=/data/domotica/aircos/paho_2_venv/bin/python /data/domotica/aircos/airco_main.py
 Restart=always
 RestartSec=300
 RuntimeMaxSec=4h
